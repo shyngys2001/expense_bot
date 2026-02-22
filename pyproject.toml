@@ -1,0 +1,23 @@
+[project]
+name = "smart-budget-tracker"
+version = "0.1.0"
+description = "MVP personal budget tracker with FastAPI"
+requires-python = ">=3.12"
+
+dependencies = []
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
