@@ -60,6 +60,7 @@ docker compose up --build
 - `POST /api/transactions`
 - `PATCH /api/transactions/{id}`
 - `DELETE /api/transactions/{id}`
+- `GET /api/transactions/{id}/debug`
 
 Пример ручной смены категории c lock:
 
@@ -78,6 +79,13 @@ curl -X PATCH http://localhost:8000/api/transactions/123 \
 - можно явно снять lock через `"category_locked": false`
 - можно вручную менять `kind` (`income|expense|transfer`); при ручной смене `match_confidence=100`
 
+`GET /api/transactions/{id}/debug` возвращает технический источник операции:
+
+- `source` (`manual|import_pdf|import_csv|import_xlsx`)
+- `import_id` (batch импорта, если есть)
+- `account_id`
+- `raw`, `external_hash`, `created_at`
+
 ### Categories
 
 - `GET /api/categories`
@@ -87,8 +95,19 @@ curl -X PATCH http://localhost:8000/api/transactions/123 \
 ### Accounts
 
 - `GET /api/accounts`
+- `GET /api/accounts/{id}/balance?from=YYYY-MM-DD&to=YYYY-MM-DD&include_pending=false`
 
-По умолчанию создается счет `Main Account`, который используется для quick-add/импорта, если `account_id` не передан.
+По умолчанию создается счет `Основной счет`, который используется для quick-add/импорта, если `account_id` не передан.
+
+Ответ `/api/accounts/{id}/balance`:
+
+- `opening_balance` — начальный остаток из выписки (если найден)
+- `calculated_closing_balance` — расчетный остаток по `signed_amount` и только `status=posted`
+- `statement_closing_balance` — остаток из шапки выписки
+- `diff` — разница между расчетом и остатком в выписке
+- `pending_total` — сумма операций `status=pending`
+- `available_balance` — остаток с учетом флага `include_pending`
+- `warning` — предупреждение (например, если нет начального остатка)
 
 ### Rules
 
@@ -164,10 +183,25 @@ curl -X POST http://localhost:8000/api/transfers/auto-pair \
 ### Import PDF Statement
 
 - `POST /api/import/pdf-statement` (`multipart/form-data`, поля `file`, `account_id`)
-- Поддерживается выписка Freedom Bank (таблица операций).
+- Поддерживаются выписки Kaspi Gold и Freedom Bank.
+- `account_id` обязателен.
 - Импортируются только строки таблицы операций, без хранения персональных данных из шапки (ИИН/номер карты).
 - Дедупликация выполняется по `external_hash`.
-- При импорте сразу заполняются `signed_amount`, `kind`, `account_id`; затем применяется автокатегоризация.
+- При импорте заполняются `signed_amount`, `kind`, `status`, `account_id`, затем применяется автокатегоризация.
+- `status=pending` ставится для операций "в обработке"; такие операции не включаются в posted-остаток и monthly totals.
+- В `statement_imports` сохраняются: `period_from/period_to`, `opening_balance`, `closing_balance`, `pending_balance`, `currency`, `account_id`.
+- Каждая импортированная транзакция получает `import_id` и `source='import_pdf'`.
+- `external_hash` учитывает `account_id`, чтобы операции разных счетов не склеивались.
+
+Откат импорта:
+
+- `POST /api/imports/{import_id}/rollback`
+- удаляет только транзакции из указанного batch (`import_id`), ручные операции не затрагиваются.
+
+Извлечение остатков из шапки:
+
+- Kaspi: `opening_balance` и `closing_balance` из строк `Доступно на ...`.
+- Freedom: `closing_balance` по валюте (`KZT`/`USD`) и `pending_balance` из строки `Сумма в обработке`.
 
 Ответ:
 
@@ -190,7 +224,7 @@ curl -X POST http://localhost:8000/api/transfers/auto-pair \
 pytest
 ```
 
-Покрыты базовые сценарии парсера quick-add.
+Покрыты quick-add, PDF-парсер (включая pending и шапку выписки), правила автокатегоризации и сверка переводов.
 
 ## Полезные команды
 
@@ -220,6 +254,19 @@ docker compose up --build
 docker compose exec api alembic upgrade head
 ```
 
+## Флаги окружения
+
+- `SEED_DEMO=false` — демо-данные не добавляются при старте (по умолчанию выключено).
+
+## Как найти лишнюю операцию
+
+1. Откройте операцию в UI: в карточке есть chip источника (`РУЧНОЕ` или `BANK PDF #id`).
+2. Для точной проверки вызовите:
+   `GET /api/transactions/{id}/debug`
+3. Если `source=manual`, это не импорт из выписки.
+4. Если `source=import_pdf`, используйте `import_id` и при необходимости откатите batch:
+   `POST /api/imports/{import_id}/rollback`
+
 ## Проверка multi-account transfer flow
 
 1. Импортируй выписку первого счета через UI/API с `account_id=1`.
@@ -227,3 +274,14 @@ docker compose exec api alembic upgrade head
 3. Вызови `POST /api/transfers/auto-pair` за нужный период.
 4. Проверь `GET /api/transfers/pairs` — пары должны иметь `kind=transfer`.
 5. Проверь отчет `GET /api/reports/monthly` — доходы/расходы не должны раздуваться переводами.
+
+## Проверка сверки остатков по выпискам
+
+1. Импортируй Kaspi PDF в нужный счет.
+2. Импортируй Freedom PDF во второй счет.
+3. Для каждого счета вызови:
+   `GET /api/accounts/{id}/balance?from=YYYY-MM-DD&to=YYYY-MM-DD&include_pending=false`
+4. Ожидаемо:
+   - `diff` близок к `0` для корректно импортированной выписки (допуск 1-2 тг).
+   - `pending_total` показывает суммы "в обработке".
+5. Если `diff` не ноль, проверь `warning` и список pending операций.

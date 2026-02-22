@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Budget Tracker</title>
+  <title>Умный учет бюджета</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -13,7 +13,7 @@
       --card: #151d39;
       --card-strong: #1a2447;
       --text: #e8edff;
-      --muted: #9eabd0;
+      --muted: #b9c7e9;
       --border: #26335f;
       --primary: #4f8cff;
       --primary-hover: #3d78ea;
@@ -35,7 +35,7 @@
       --card: #ffffff;
       --card-strong: #f8faff;
       --text: #1c284e;
-      --muted: #5f6f9d;
+      --muted: #4d5d8f;
       --border: #d9e2ff;
       --primary: #2e65f3;
       --primary-hover: #1e54dd;
@@ -84,7 +84,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 16px 20px;
+      padding: 12px 18px;
       border-bottom: 1px solid var(--border);
       background: color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter: blur(10px);
@@ -130,7 +130,7 @@
       flex: 1;
       min-height: 0;
       overflow: hidden;
-      padding: 14px 16px 16px;
+      padding: 10px 12px 12px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -151,7 +151,7 @@
     }
 
     .card-header {
-      padding: 14px 16px 0;
+      padding: 12px 14px 0;
       font-size: 13px;
       color: var(--muted);
       font-weight: 600;
@@ -160,7 +160,7 @@
     }
 
     .card-body {
-      padding: 12px 16px 16px;
+      padding: 10px 14px 12px;
     }
 
     .form-row {
@@ -189,6 +189,7 @@
       background: var(--card-strong);
       outline: none;
       transition: border 0.2s ease, transform 0.15s ease, background 0.2s ease;
+      min-height: 40px;
     }
 
     textarea {
@@ -204,7 +205,7 @@
 
     input[type="month"],
     input[type="file"] {
-      min-height: 42px;
+      min-height: 40px;
     }
 
     input[type="file"] {
@@ -222,7 +223,7 @@
     .btn {
       cursor: pointer;
       font-weight: 600;
-      min-height: 42px;
+      min-height: 40px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -299,7 +300,7 @@
 
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 12px;
       min-height: 0;
     }
@@ -321,6 +322,63 @@
       font-size: 22px;
       font-weight: 700;
       letter-spacing: 0.01em;
+    }
+
+    .balances-card {
+      padding: 14px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .balances-head {
+      display: grid;
+      grid-template-columns: minmax(0, 260px) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .balances-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .balances-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .balance-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: color-mix(in srgb, var(--card-strong) 78%, transparent);
+    }
+
+    .balance-item .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .balance-item .value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .balance-warning {
+      border: 1px solid color-mix(in srgb, var(--warning) 52%, transparent);
+      background: color-mix(in srgb, var(--warning) 12%, transparent);
+      color: color-mix(in srgb, var(--warning) 90%, var(--text));
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      display: none;
     }
 
     .main-grid {
@@ -436,6 +494,12 @@
       color: var(--warning);
       border-color: color-mix(in srgb, var(--warning) 55%, transparent);
       background: color-mix(in srgb, var(--warning) 14%, transparent);
+    }
+
+    .chip.source {
+      color: color-mix(in srgb, var(--text) 88%, #9eb8ff);
+      border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
     }
 
     .tx-right {
@@ -753,6 +817,11 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .balances-head,
+      .balances-grid {
+        grid-template-columns: 1fr;
+      }
+
       .form-row,
       .import-row,
       .filters,
@@ -825,7 +894,7 @@
 <div class="app-shell">
   <header class="app-header">
     <div class="brand">
-      <h1>Smart Budget Tracker</h1>
+      <h1>Умный учет бюджета</h1>
       <p>Быстрый ввод, PDF импорт, отчеты и аналитика</p>
     </div>
     <button id="theme-toggle" class="theme-toggle" type="button">Тема</button>
@@ -834,7 +903,7 @@
   <main class="page">
     <section class="controls-grid">
       <div class="card">
-        <div class="card-header">Quick Add</div>
+        <div class="card-header">Быстрое добавление</div>
         <div class="card-body">
           <form id="quick-add-form" class="form-row">
             <input id="quick-text" type="text" placeholder="Пример: кофе 1200 или зарплата +500000" required />
@@ -859,49 +928,95 @@
           <button id="auto-pair-btn" class="btn btn-primary" type="button" style="margin-top: 10px; width: 100%;">
             Сверить переводы
           </button>
-          <div id="import-alert" class="alert-card"></div>
+          <button id="rollback-import-btn" class="btn btn-secondary" type="button" style="margin-top: 8px; width: 100%;" disabled>
+            Откатить последний импорт
+          </button>
+          <div id="import-alert" class="alert-card">
+            <div id="import-alert-summary"></div>
+            <details id="import-alert-details" style="margin-top: 8px; display: none;">
+              <summary style="cursor: pointer;">Показать детали ошибок</summary>
+              <pre id="import-alert-errors" style="margin: 8px 0 0; white-space: pre-wrap;"></pre>
+            </details>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="kpi-grid">
       <article class="card kpi-card">
-        <div class="kpi-label">Income</div>
-        <div id="kpi-income" class="kpi-value">0.00 KZT</div>
+        <div class="kpi-label">Доходы</div>
+        <div id="kpi-income" class="kpi-value">0,00 ₸</div>
       </article>
       <article class="card kpi-card">
-        <div class="kpi-label">Expense</div>
-        <div id="kpi-expense" class="kpi-value">0.00 KZT</div>
+        <div class="kpi-label">Расходы</div>
+        <div id="kpi-expense" class="kpi-value">0,00 ₸</div>
       </article>
       <article class="card kpi-card">
-        <div class="kpi-label">Balance</div>
-        <div id="kpi-balance" class="kpi-value">0.00 KZT</div>
+        <div class="kpi-label">Баланс</div>
+        <div id="kpi-balance" class="kpi-value">0,00 ₸</div>
       </article>
       <article class="card kpi-card">
-        <div class="kpi-label">Avg Daily Expense</div>
-        <div id="kpi-avg-expense" class="kpi-value">0.00 KZT</div>
+        <div class="kpi-label">Средний расход / день</div>
+        <div id="kpi-avg-expense" class="kpi-value">0,00 ₸</div>
       </article>
       <article class="card kpi-card">
-        <div class="kpi-label">Transfers</div>
-        <div id="kpi-transfers" class="kpi-value">0.00 KZT</div>
+        <div class="kpi-label">Переводы</div>
+        <div id="kpi-transfers" class="kpi-value">0,00 ₸</div>
       </article>
+      <article class="card kpi-card">
+        <div class="kpi-label">В обработке</div>
+        <div id="kpi-pending" class="kpi-value">0,00 ₸</div>
+      </article>
+    </section>
+
+    <section class="card balances-card">
+      <div class="balances-head">
+        <select id="balance-account"></select>
+        <label class="balances-switch">
+          <input id="balance-include-pending" type="checkbox" />
+          <span>Учитывать суммы в обработке</span>
+        </label>
+      </div>
+      <div class="balances-grid">
+        <article class="balance-item">
+          <div class="label">Остаток по выписке</div>
+          <div id="balance-statement" class="value">-</div>
+        </article>
+        <article class="balance-item">
+          <div class="label">Расчётный остаток</div>
+          <div id="balance-calculated" class="value">-</div>
+        </article>
+        <article class="balance-item">
+          <div class="label">Доступно (с обработкой)</div>
+          <div id="balance-available" class="value">-</div>
+        </article>
+        <article class="balance-item">
+          <div class="label">Разница</div>
+          <div id="balance-diff" class="value">-</div>
+        </article>
+        <article class="balance-item">
+          <div class="label">В обработке</div>
+          <div id="balance-pending" class="value">-</div>
+        </article>
+      </div>
+      <div id="balance-warning" class="balance-warning"></div>
     </section>
 
     <section class="main-grid">
       <section class="card transactions-panel">
         <div class="panel-head">
-          <h2 class="panel-title">Transactions</h2>
+          <h2 class="panel-title">Операции</h2>
         </div>
         <div class="filters">
           <input id="search-input" type="text" placeholder="Поиск по описанию" />
           <select id="type-filter">
-            <option value="all">Type: All</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-            <option value="transfer">Transfer</option>
+            <option value="all">Тип: все</option>
+            <option value="income">Доход</option>
+            <option value="expense">Расход</option>
+            <option value="transfer">Перевод</option>
           </select>
           <select id="category-filter">
-            <option value="all">Category: All</option>
+            <option value="all">Категория: все</option>
           </select>
         </div>
         <div class="transactions-scroll">
@@ -911,19 +1026,19 @@
 
       <aside class="card analytics-panel">
         <article class="chart-card">
-          <h3 class="chart-title">Daily Expense</h3>
+          <h3 class="chart-title">Расходы по дням</h3>
           <div class="chart-wrap">
             <canvas id="daily-chart"></canvas>
           </div>
         </article>
         <article class="chart-card">
-          <h3 class="chart-title">Expense by Category</h3>
+          <h3 class="chart-title">Расходы по категориям</h3>
           <div class="chart-wrap">
             <canvas id="category-chart"></canvas>
           </div>
         </article>
         <article class="chart-card">
-          <h3 class="chart-title">Income vs Expense</h3>
+          <h3 class="chart-title">Доходы и расходы</h3>
           <div class="chart-wrap">
             <canvas id="compare-chart"></canvas>
           </div>
@@ -948,6 +1063,7 @@
         <label>Описание</label>
         <textarea id="tx-modal-description" readonly></textarea>
         <p id="tx-modal-transfer-info" class="field-note"></p>
+        <div class="field-note" id="tx-modal-origin"></div>
       </div>
 
       <div class="modal-grid">
@@ -975,19 +1091,24 @@
             <input id="tx-modal-rule-pattern" type="text" placeholder="например yandex.go" />
           </div>
           <div class="field">
-            <label>Match type</label>
+            <label>Тип совпадения</label>
             <select id="tx-modal-rule-match-type">
-              <option value="contains">contains</option>
-              <option value="regex">regex</option>
+              <option value="contains">содержит</option>
+              <option value="regex">регулярное выражение</option>
             </select>
           </div>
           <div class="field">
-            <label>Priority</label>
+            <label>Приоритет</label>
             <input id="tx-modal-rule-priority" type="number" min="0" step="1" value="100" />
           </div>
         </div>
         <p id="tx-modal-rule-hint" class="field-note">Применится к операциям, где описание содержит паттерн.</p>
       </div>
+
+      <details class="rule-card">
+        <summary style="cursor: pointer;">Сырые данные импорта (debug)</summary>
+        <pre id="tx-modal-raw" style="margin: 8px 0 0; white-space: pre-wrap; max-height: 180px; overflow: auto;"></pre>
+      </details>
 
       <div id="tx-modal-error" class="inline-error"></div>
     </div>
@@ -1009,7 +1130,10 @@
     report: null,
     categories: [],
     accounts: [],
+    accountBalance: null,
+    lastImportId: null,
     selectedTransaction: null,
+    selectedTransactionDebug: null,
     modalLockTouched: false,
     charts: {
       daily: null,
@@ -1030,8 +1154,20 @@
   const pdfFileInput = document.getElementById("pdf-file");
   const importAccount = document.getElementById("import-account");
   const importAlert = document.getElementById("import-alert");
+  const importAlertSummary = document.getElementById("import-alert-summary");
+  const importAlertDetails = document.getElementById("import-alert-details");
+  const importAlertErrors = document.getElementById("import-alert-errors");
   const importSubmit = document.getElementById("import-submit");
   const autoPairBtn = document.getElementById("auto-pair-btn");
+  const rollbackImportBtn = document.getElementById("rollback-import-btn");
+  const balanceAccount = document.getElementById("balance-account");
+  const balanceIncludePending = document.getElementById("balance-include-pending");
+  const balanceStatement = document.getElementById("balance-statement");
+  const balanceCalculated = document.getElementById("balance-calculated");
+  const balanceAvailable = document.getElementById("balance-available");
+  const balanceDiff = document.getElementById("balance-diff");
+  const balancePending = document.getElementById("balance-pending");
+  const balanceWarning = document.getElementById("balance-warning");
 
   const searchInput = document.getElementById("search-input");
   const typeFilter = document.getElementById("type-filter");
@@ -1043,6 +1179,7 @@
   const kpiBalance = document.getElementById("kpi-balance");
   const kpiAvgExpense = document.getElementById("kpi-avg-expense");
   const kpiTransfers = document.getElementById("kpi-transfers");
+  const kpiPending = document.getElementById("kpi-pending");
 
   const themeToggle = document.getElementById("theme-toggle");
   const toast = document.getElementById("toast");
@@ -1055,6 +1192,8 @@
   const txModalSubtitle = document.getElementById("tx-modal-subtitle");
   const txModalDescription = document.getElementById("tx-modal-description");
   const txModalTransferInfo = document.getElementById("tx-modal-transfer-info");
+  const txModalOrigin = document.getElementById("tx-modal-origin");
+  const txModalRaw = document.getElementById("tx-modal-raw");
   const txModalCategory = document.getElementById("tx-modal-category");
   const txModalLocked = document.getElementById("tx-modal-locked");
   const txModalCreateRule = document.getElementById("tx-modal-create-rule");
@@ -1063,6 +1202,24 @@
   const txModalRulePriority = document.getElementById("tx-modal-rule-priority");
   const txModalRuleHint = document.getElementById("tx-modal-rule-hint");
   const txModalError = document.getElementById("tx-modal-error");
+  const CATEGORY_LABELS = {
+    Food: "Еда",
+    Transport: "Транспорт",
+    Home: "Дом",
+    Health: "Здоровье",
+    Entertainment: "Развлечения",
+    Subscriptions: "Подписки",
+    Transfers: "Переводы",
+    Salary: "Зарплата",
+    Gift: "Подарки",
+    Other: "Другое"
+  };
+  const SOURCE_LABELS = {
+    manual: "РУЧНОЕ",
+    import_pdf: "PDF ИМПОРТ",
+    import_csv: "CSV ИМПОРТ",
+    import_xlsx: "XLSX ИМПОРТ"
+  };
 
   function currentMonthValue() {
     const now = new Date();
@@ -1076,8 +1233,8 @@
   function setTheme(theme) {
     document.body.setAttribute("data-theme", theme);
     localStorage.setItem("sbt_theme", theme);
-    themeToggle.textContent = theme === "dark" ? "☀ Светлая" : "🌙 Тёмная";
-    renderCharts(state.filteredTransactions);
+    themeToggle.textContent = theme === "dark" ? "Светлая тема" : "Тёмная тема";
+    renderCharts(state.transactions);
   }
 
   function toggleTheme() {
@@ -1093,22 +1250,34 @@
     }, 2200);
   }
 
-  function setImportAlert(message, kind) {
+  function setImportAlert(message, kind, details = []) {
     importAlert.className = "alert-card";
     if (!message) {
-      importAlert.textContent = "";
+      importAlertSummary.textContent = "";
+      importAlertDetails.style.display = "none";
+      importAlertDetails.open = false;
+      importAlertErrors.textContent = "";
       return;
     }
-    importAlert.textContent = message;
+    importAlertSummary.textContent = message;
+    if (details.length) {
+      importAlertDetails.style.display = "block";
+      importAlertErrors.textContent = details.join("\n");
+    } else {
+      importAlertDetails.style.display = "none";
+      importAlertDetails.open = false;
+      importAlertErrors.textContent = "";
+    }
     importAlert.classList.add(kind === "error" ? "alert-error" : "alert-success");
   }
 
   function formatMoney(value, currency = "KZT") {
     const amount = Number(value || 0);
+    const symbol = currency === "USD" ? "$" : "₸";
     return `${amount.toLocaleString("ru-RU", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    })} ${currency}`;
+    })} ${symbol}`;
   }
 
   function formatDate(dateValue) {
@@ -1116,11 +1285,7 @@
     if (Number.isNaN(parsed.getTime())) {
       return dateValue;
     }
-    return parsed.toLocaleDateString("ru-RU", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    });
+    return parsed.toLocaleDateString("ru-RU");
   }
 
   function daysInMonth(month) {
@@ -1149,12 +1314,33 @@
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }
 
-  function isPending(description) {
-    return description.toLowerCase().includes("в обработке");
+  function isPending(tx) {
+    return tx.status === "pending" || tx.description.toLowerCase().includes("в обработке");
   }
 
   function normalizeDescription(text) {
     return text.toLowerCase().replace(/\s+/g, " ").trim();
+  }
+
+  function localizeCategoryName(name) {
+    return CATEGORY_LABELS[name] || name;
+  }
+
+  function formatSourceLabel(tx) {
+    if (tx.source === "manual") {
+      return SOURCE_LABELS.manual;
+    }
+    if (tx.source === "import_pdf") {
+      const bank = (tx.account_bank || tx.account_name || "PDF").toUpperCase().split(" ")[0];
+      return tx.import_id ? `${bank} PDF #${tx.import_id}` : `${bank} PDF (без batch)`;
+    }
+    if (tx.source === "import_csv") {
+      return `${SOURCE_LABELS.import_csv} #${tx.import_id ?? "?"}`;
+    }
+    if (tx.source === "import_xlsx") {
+      return `${SOURCE_LABELS.import_xlsx} #${tx.import_id ?? "?"}`;
+    }
+    return tx.source;
   }
 
   function extractMerchant(description) {
@@ -1203,13 +1389,15 @@
 
   function updateCategoryFilterOptions(items) {
     const currentValue = categoryFilter.value;
-    const categories = [...new Set(items.map((item) => item.category_name))].sort((a, b) => a.localeCompare(b));
+    const categories = [...new Set(items.map((item) => item.category_name))].sort((a, b) =>
+      localizeCategoryName(a).localeCompare(localizeCategoryName(b), "ru")
+    );
 
-    categoryFilter.innerHTML = '<option value="all">Category: All</option>';
+    categoryFilter.innerHTML = '<option value="all">Категория: все</option>';
     for (const category of categories) {
       const option = document.createElement("option");
       option.value = category;
-      option.textContent = category;
+      option.textContent = localizeCategoryName(category);
       categoryFilter.appendChild(option);
     }
 
@@ -1228,7 +1416,9 @@
         !query ||
         tx.description.toLowerCase().includes(query) ||
         tx.category_name.toLowerCase().includes(query) ||
-        tx.account_name.toLowerCase().includes(query);
+        localizeCategoryName(tx.category_name).toLowerCase().includes(query) ||
+        tx.account_name.toLowerCase().includes(query) ||
+        formatSourceLabel(tx).toLowerCase().includes(query);
       const matchesType = type === "all" || tx.kind === type;
       const matchesCategory = category === "all" || tx.category_name === category;
       return matchesQuery && matchesType && matchesCategory;
@@ -1256,18 +1446,21 @@
       const signed = Number(tx.signed_amount || 0);
       const sign = signed >= 0 ? "+" : "-";
       const amountClass = signed >= 0 ? "income" : "expense";
-      const pendingChip = isPending(tx.description) ? '<span class="chip pending">pending</span>' : "";
-      const lockedChip = tx.category_locked ? '<span class="chip locked">🔒 locked</span>' : "";
-      const transferChip = tx.kind === "transfer" ? '<span class="chip transfer">transfer</span>' : "";
+      const pendingChip = isPending(tx) ? '<span class="chip pending">в обработке</span>' : "";
+      const lockedChip = tx.category_locked ? '<span class="chip locked">🔒 закреплено</span>' : "";
+      const transferChip = tx.kind === "transfer" ? '<span class="chip transfer">перевод</span>' : "";
+      const sourceChip = `<span class="chip source">${formatSourceLabel(tx)}</span>`;
+      const kindText = tx.kind === "income" ? "доход" : tx.kind === "expense" ? "расход" : "перевод";
 
       item.innerHTML = `
         <div>
           <div class="tx-date">${formatDate(tx.tx_date)}</div>
           <p class="tx-desc">${tx.description}</p>
           <div class="tx-meta">
-            <span class="chip">${tx.category_name}</span>
+            <span class="chip">${localizeCategoryName(tx.category_name)}</span>
             <span class="chip">${tx.account_name}</span>
-            <span class="chip">${tx.kind}</span>
+            <span class="chip">${kindText}</span>
+            ${sourceChip}
             ${transferChip}
             ${lockedChip}
             ${pendingChip}
@@ -1286,11 +1479,12 @@
   function renderKpis() {
     const report = state.report;
     if (!report) {
-      kpiIncome.textContent = "0.00 KZT";
-      kpiExpense.textContent = "0.00 KZT";
-      kpiBalance.textContent = "0.00 KZT";
-      kpiAvgExpense.textContent = "0.00 KZT";
-      kpiTransfers.textContent = "0.00 KZT";
+      kpiIncome.textContent = "0,00 ₸";
+      kpiExpense.textContent = "0,00 ₸";
+      kpiBalance.textContent = "0,00 ₸";
+      kpiAvgExpense.textContent = "0,00 ₸";
+      kpiTransfers.textContent = "0,00 ₸";
+      kpiPending.textContent = "0,00 ₸";
       return;
     }
 
@@ -1298,6 +1492,7 @@
     kpiExpense.textContent = formatMoney(report.total_expense, "KZT");
     kpiBalance.textContent = formatMoney(report.balance, "KZT");
     kpiTransfers.textContent = formatMoney(report.total_transfers || 0, "KZT");
+    kpiPending.textContent = formatMoney(report.total_pending || 0, "KZT");
 
     const totalExpense = Number(report.total_expense || 0);
     const avg = totalExpense / Math.max(1, daysInMonth(monthInput.value));
@@ -1335,6 +1530,9 @@
     let totalExpense = 0;
 
     for (const tx of txs) {
+      if (tx.status === "pending") {
+        continue;
+      }
       const amount = Number(tx.amount || 0);
       if (tx.kind === "expense") {
         totalExpense += amount;
@@ -1356,7 +1554,7 @@
         labels: dailyLabels,
         datasets: [
           {
-            label: "Expense",
+            label: "Расходы",
             data: dailyValues,
             borderColor: colors.expense,
             backgroundColor: "rgba(255, 138, 159, 0.16)",
@@ -1379,17 +1577,17 @@
       }
     });
 
-    const categoryLabels = [...expenseByCategory.keys()];
+    const categoryLabels = [...expenseByCategory.keys()].map((name) => localizeCategoryName(name));
     const categoryValues = [...expenseByCategory.values()].map((value) => Number(value.toFixed(2)));
 
     destroyChart("category");
     state.charts.category = new Chart(document.getElementById("category-chart"), {
       type: "doughnut",
       data: {
-        labels: categoryLabels.length ? categoryLabels : ["No expense"],
+        labels: categoryLabels.length ? categoryLabels : ["Нет расходов"],
         datasets: [
           {
-            label: "Category expense",
+            label: "Расходы по категориям",
             data: categoryValues.length ? categoryValues : [1],
             backgroundColor: [
               "#4f8cff",
@@ -1419,10 +1617,10 @@
     state.charts.compare = new Chart(document.getElementById("compare-chart"), {
       type: "bar",
       data: {
-        labels: ["Income", "Expense"],
+        labels: ["Доходы", "Расходы"],
         datasets: [
           {
-            label: "Amount",
+            label: "Сумма",
             data: [Number(totalIncome.toFixed(2)), Number(totalExpense.toFixed(2))],
             backgroundColor: [colors.income, colors.expense],
             borderRadius: 8,
@@ -1478,6 +1676,24 @@
     return response.json();
   }
 
+  async function loadAccountBalance() {
+    const accountId = Number(balanceAccount.value);
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      return null;
+    }
+    const { from, to } = monthBounds(monthInput.value);
+    const params = new URLSearchParams({
+      from,
+      to,
+      include_pending: balanceIncludePending.checked ? "true" : "false"
+    });
+    const response = await fetch(`/api/accounts/${accountId}/balance?${params.toString()}`);
+    if (!response.ok) {
+      throw new Error("Не удалось загрузить остаток по счету");
+    }
+    return response.json();
+  }
+
   async function loadCategories() {
     const response = await fetch("/api/categories");
     if (!response.ok) {
@@ -1486,10 +1702,19 @@
     return response.json();
   }
 
+  async function loadTransactionDebug(transactionId) {
+    const response = await fetch(`/api/transactions/${transactionId}/debug`);
+    if (!response.ok) {
+      throw new Error("Не удалось получить debug-информацию");
+    }
+    return response.json();
+  }
+
   function renderAccountOptions(accounts) {
     const previousFilter = accountFilter.value || "all";
     accountFilter.innerHTML = '<option value="all">Все счета</option>';
     importAccount.innerHTML = "";
+    balanceAccount.innerHTML = "";
 
     for (const account of accounts) {
       const filterOption = document.createElement("option");
@@ -1501,6 +1726,11 @@
       importOption.value = String(account.id);
       importOption.textContent = `${account.name} (${account.currency})`;
       importAccount.appendChild(importOption);
+
+      const balanceOption = document.createElement("option");
+      balanceOption.value = String(account.id);
+      balanceOption.textContent = `${account.name} (${account.currency})`;
+      balanceAccount.appendChild(balanceOption);
     }
 
     if ([...accountFilter.options].some((option) => option.value === previousFilter)) {
@@ -1512,6 +1742,43 @@
     const selectedAccountId = getSelectedAccountId();
     if (selectedAccountId !== null) {
       importAccount.value = String(selectedAccountId);
+      balanceAccount.value = String(selectedAccountId);
+    } else if (accounts.length) {
+      const first = String(accounts[0].id);
+      importAccount.value = first;
+      balanceAccount.value = first;
+    }
+  }
+
+  function renderAccountBalance() {
+    const balance = state.accountBalance;
+    if (!balance) {
+      balanceStatement.textContent = "-";
+      balanceCalculated.textContent = "-";
+      balanceAvailable.textContent = "-";
+      balanceDiff.textContent = "-";
+      balancePending.textContent = "-";
+      balanceWarning.style.display = "none";
+      balanceWarning.textContent = "";
+      return;
+    }
+
+    const currency = balance.currency || "KZT";
+    balanceStatement.textContent =
+      balance.statement_closing_balance == null
+        ? "нет в выписке"
+        : formatMoney(balance.statement_closing_balance, currency);
+    balanceCalculated.textContent = formatMoney(balance.calculated_closing_balance, currency);
+    balanceAvailable.textContent = formatMoney(balance.available_balance, currency);
+    balanceDiff.textContent = balance.diff == null ? "—" : formatMoney(balance.diff, currency);
+    balancePending.textContent = formatMoney(balance.pending_total || 0, currency);
+
+    if (balance.warning) {
+      balanceWarning.style.display = "block";
+      balanceWarning.textContent = balance.warning;
+    } else {
+      balanceWarning.style.display = "none";
+      balanceWarning.textContent = "";
     }
   }
 
@@ -1525,14 +1792,20 @@
   async function refresh() {
     try {
       setLoading(true);
-      const [transactions, report] = await Promise.all([loadTransactions(), loadReport()]);
+      const [transactions, report, accountBalance] = await Promise.all([
+        loadTransactions(),
+        loadReport(),
+        loadAccountBalance()
+      ]);
       state.transactions = transactions;
       state.report = report;
+      state.accountBalance = accountBalance;
       updateCategoryFilterOptions(transactions);
       applyFilters();
       renderTransactions();
       renderKpis();
-      renderCharts(state.filteredTransactions);
+      renderAccountBalance();
+      renderCharts(state.transactions);
     } catch (error) {
       quickError.textContent = error.message;
       showToast(error.message, "error");
@@ -1550,25 +1823,30 @@
 
   function openTransactionModal(transaction) {
     state.selectedTransaction = transaction;
+    state.selectedTransactionDebug = null;
     state.modalLockTouched = false;
     txModalError.textContent = "";
 
     const signed = Number(transaction.signed_amount || 0);
     const sign = signed >= 0 ? "+" : "-";
-    txModalSubtitle.textContent = `${formatDate(transaction.tx_date)} • ${sign}${formatMoney(Math.abs(signed), transaction.currency)} • ${transaction.kind}`;
+    const kindText = transaction.kind === "income" ? "доход" : transaction.kind === "expense" ? "расход" : "перевод";
+    txModalSubtitle.textContent = `${formatDate(transaction.tx_date)} • ${sign}${formatMoney(Math.abs(signed), transaction.currency)} • ${kindText}`;
     txModalDescription.value = transaction.description;
     if (transaction.matched_account_name) {
-      txModalTransferInfo.textContent = `Связано со счётом: ${transaction.matched_account_name}, confidence: ${transaction.match_confidence || 0}%`;
+      txModalTransferInfo.textContent = `Связано со счётом: ${transaction.matched_account_name}, уверенность: ${transaction.match_confidence || 0}%`;
     } else {
       txModalTransferInfo.textContent = "Перевод не связан автоматически";
     }
+    const importPart = transaction.import_id ? `Импорт #${transaction.import_id}` : "Без import batch";
+    txModalOrigin.textContent = `Счёт: ${transaction.account_name} • Источник: ${formatSourceLabel(transaction)} • ${importPart}`;
+    txModalRaw.textContent = "Загрузка debug-данных...";
 
     const allowedCategories = state.categories.filter((cat) => cat.type === transaction.type);
     txModalCategory.innerHTML = "";
     for (const category of allowedCategories) {
       const option = document.createElement("option");
       option.value = String(category.id);
-      option.textContent = category.name;
+      option.textContent = localizeCategoryName(category.name);
       txModalCategory.appendChild(option);
     }
     txModalCategory.value = String(transaction.category_id);
@@ -1586,6 +1864,7 @@
 
   function closeTransactionModal() {
     state.selectedTransaction = null;
+    state.selectedTransactionDebug = null;
     txModalOverlay.classList.remove("show");
     txModalOverlay.setAttribute("aria-hidden", "true");
   }
@@ -1613,7 +1892,7 @@
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.detail || "Ошибка quick add");
+        throw new Error(data.detail || "Не удалось добавить операцию");
       }
 
       quickText.value = "";
@@ -1633,6 +1912,10 @@
       setImportAlert("Выберите PDF файл", "error");
       return;
     }
+    if (!importAccount.value) {
+      setImportAlert("Выберите счёт для импорта", "error");
+      return;
+    }
 
     try {
       importSubmit.disabled = true;
@@ -1641,9 +1924,7 @@
 
       const formData = new FormData();
       formData.append("file", pdfFileInput.files[0]);
-      if (importAccount.value) {
-        formData.append("account_id", importAccount.value);
-      }
+      formData.append("account_id", importAccount.value);
 
       const response = await fetch("/api/import/pdf-statement", {
         method: "POST",
@@ -1655,11 +1936,14 @@
         throw new Error(data.detail || "Ошибка импорта PDF");
       }
 
-      const message = `Импорт завершен\nВсего строк: ${data.rows_total}\nДобавлено: ${data.inserted}\nПропущено: ${data.skipped}`;
-      setImportAlert(message, "success");
+      state.lastImportId = data.import_id || null;
+      rollbackImportBtn.disabled = !state.lastImportId;
 
+      const message = `Импорт #${data.import_id} завершён. Строк: ${data.rows_total}, добавлено: ${data.inserted}, пропущено: ${data.skipped}.`;
       if (data.errors && data.errors.length) {
-        setImportAlert(`${message}\nОшибки:\n${data.errors.join("\n")}`, "error");
+        setImportAlert(message, "error", data.errors);
+      } else {
+        setImportAlert(message, "success");
       }
 
       showToast("Импорт завершён", "success");
@@ -1671,6 +1955,30 @@
     } finally {
       importSubmit.disabled = false;
       importSubmit.textContent = "Импорт PDF";
+    }
+  }
+
+  async function handleRollbackImport() {
+    if (!state.lastImportId) {
+      return;
+    }
+    try {
+      rollbackImportBtn.disabled = true;
+      rollbackImportBtn.innerHTML = '<span class="spinner"></span> Откат...';
+      const response = await fetch(`/api/imports/${state.lastImportId}/rollback`, { method: "POST" });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.detail || "Не удалось откатить импорт");
+      }
+      setImportAlert(`Импорт #${state.lastImportId} откатан. Удалено операций: ${payload.deleted}.`, "success");
+      showToast("Откат импорта выполнен", "success");
+      await refresh();
+    } catch (error) {
+      setImportAlert(error.message, "error");
+      showToast(error.message, "error");
+    } finally {
+      rollbackImportBtn.disabled = !state.lastImportId;
+      rollbackImportBtn.textContent = "Откатить последний импорт";
     }
   }
 
@@ -1755,7 +2063,7 @@
         const priority = Number(txModalRulePriority.value || 100);
 
         if (!pattern) {
-          throw new Error("Укажите pattern для автоправила");
+          throw new Error("Укажите паттерн для автоправила");
         }
 
         const ruleResponse = await fetch("/api/rules", {
@@ -1791,7 +2099,7 @@
   function handleFiltersChange() {
     applyFilters();
     renderTransactions();
-    renderCharts(state.filteredTransactions);
+    renderCharts(state.transactions);
   }
 
   async function handleTransactionsClick(event) {
@@ -1825,7 +2133,26 @@
     try {
       await ensureCategoriesLoaded();
       openTransactionModal(transaction);
+      const debug = await loadTransactionDebug(transaction.id);
+      state.selectedTransactionDebug = debug;
+      const sourceText = debug.import_id
+        ? `${formatSourceLabel(transaction)} • import_id=${debug.import_id}`
+        : formatSourceLabel(transaction);
+      txModalOrigin.textContent = `Счёт: ${transaction.account_name} • ${sourceText} • Создано: ${formatDate(debug.created_at)}`;
+      txModalRaw.textContent = JSON.stringify(
+        {
+          raw: debug.raw,
+          external_hash: debug.external_hash,
+          source: debug.source,
+          import_id: debug.import_id,
+          account_id: debug.account_id,
+          created_at: debug.created_at
+        },
+        null,
+        2
+      );
     } catch (error) {
+      txModalRaw.textContent = "Не удалось загрузить debug-данные";
       showToast(error.message, "error");
     }
   }
@@ -1852,7 +2179,7 @@
   function updateRuleHint() {
     const pattern = txModalRulePattern.value.trim();
     if (txModalRuleMatchType.value === "regex") {
-      txModalRuleHint.textContent = `Применится к операциям, где regex совпадает с: ${pattern || "паттерн"}`;
+      txModalRuleHint.textContent = `Применится к операциям, где регулярное выражение совпадает с: ${pattern || "паттерн"}`;
     } else {
       txModalRuleHint.textContent = `Применится к операциям, где описание содержит: ${pattern || "паттерн"}`;
     }
@@ -1877,6 +2204,7 @@
 
     quickAddForm.addEventListener("submit", handleQuickAdd);
     pdfImportForm.addEventListener("submit", handleImport);
+    rollbackImportBtn.addEventListener("click", handleRollbackImport);
     autoPairBtn.addEventListener("click", handleAutoPair);
 
     monthInput.addEventListener("change", refresh);
@@ -1887,9 +2215,12 @@
       const selectedAccountId = getSelectedAccountId();
       if (selectedAccountId !== null) {
         importAccount.value = String(selectedAccountId);
+        balanceAccount.value = String(selectedAccountId);
       }
       await refresh();
     });
+    balanceAccount.addEventListener("change", refresh);
+    balanceIncludePending.addEventListener("change", refresh);
     themeToggle.addEventListener("click", toggleTheme);
 
     transactionsList.addEventListener("click", handleTransactionsClick);

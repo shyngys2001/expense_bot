@@ -11,7 +11,7 @@ class Account(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    bank: Mapped[str] = mapped_column(String(100), nullable=False, default="Unknown", server_default="Unknown")
+    bank: Mapped[str] = mapped_column(String(100), nullable=False, default="Не указан", server_default="Не указан")
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="KZT", server_default="KZT")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
     created_at: Mapped[dt.datetime] = mapped_column(

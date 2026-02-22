@@ -1,10 +1,11 @@
 import datetime as dt
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models.enums import TransactionKind, TransactionType
+from app.models.enums import TransactionKind, TransactionSource, TransactionStatus, TransactionType
 
 
 class QuickAddRequest(BaseModel):
@@ -16,7 +17,7 @@ class QuickAddRequest(BaseModel):
     def strip_text(cls, value: str) -> str:
         stripped = value.strip()
         if not stripped:
-            raise ValueError("Text cannot be empty")
+            raise ValueError("Текст не может быть пустым")
         return stripped
 
 
@@ -39,7 +40,7 @@ class TransactionCreate(BaseModel):
     def validate_description(cls, value: str) -> str:
         normalized = value.strip()
         if not normalized:
-            raise ValueError("Description cannot be empty")
+            raise ValueError("Описание не может быть пустым")
         return normalized
 
 
@@ -53,8 +54,11 @@ class TransactionRead(BaseModel):
     currency: str
     type: TransactionType
     kind: TransactionKind
+    status: TransactionStatus
     account_id: int
     account_name: str
+    account_bank: str | None = None
+    import_id: int | None = None
     category_id: int
     category_name: str
     category_locked: bool
@@ -62,7 +66,7 @@ class TransactionRead(BaseModel):
     matched_account_id: int | None
     matched_account_name: str | None
     match_confidence: int | None
-    source: str
+    source: TransactionSource
     tx_date: dt.date
     posted_at: dt.datetime | None
     created_at: dt.datetime
@@ -72,3 +76,13 @@ class TransactionUpdate(BaseModel):
     category_id: int | None = None
     category_locked: bool | None = None
     kind: TransactionKind | None = None
+
+
+class TransactionDebugRead(BaseModel):
+    id: int
+    source: TransactionSource
+    import_id: int | None
+    account_id: int
+    raw: dict[str, Any] | None
+    external_hash: str | None
+    created_at: dt.datetime

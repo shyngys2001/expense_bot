@@ -85,7 +85,7 @@ async def find_category_for(session: AsyncSession, description: str, tx_type: Tr
         select(Category.id).where(Category.name == "Other", Category.type == tx_type)
     )
     if other_category is None:
-        raise RuntimeError("Default category 'Other' not found")
+        raise RuntimeError("Категория по умолчанию 'Other' не найдена")
 
     return other_category
 

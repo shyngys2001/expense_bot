@@ -3,8 +3,9 @@ from app.schemas.transaction import TransactionRead
 
 
 def serialize_transaction(transaction: Transaction) -> TransactionRead:
-    category_name = transaction.category.name if transaction.category else "Unknown"
-    account_name = transaction.account.name if transaction.account else "Unknown"
+    category_name = transaction.category.name if transaction.category else "Неизвестно"
+    account_name = transaction.account.name if transaction.account else "Неизвестно"
+    account_bank = transaction.account.bank if transaction.account else None
     matched_account_name = transaction.matched_account.name if transaction.matched_account else None
     return TransactionRead(
         id=transaction.id,
@@ -14,8 +15,11 @@ def serialize_transaction(transaction: Transaction) -> TransactionRead:
         currency=transaction.currency,
         type=transaction.type,
         kind=transaction.kind,
+        status=transaction.status,
         account_id=transaction.account_id,
         account_name=account_name,
+        account_bank=account_bank,
+        import_id=transaction.import_id,
         category_id=transaction.category_id,
         category_name=category_name,
         category_locked=transaction.category_locked,

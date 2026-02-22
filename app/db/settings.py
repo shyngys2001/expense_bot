@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     database_url: str = "postgresql+asyncpg://postgres:postgres@db:5432/budget"
+    seed_demo: bool = False
 
 
 @lru_cache

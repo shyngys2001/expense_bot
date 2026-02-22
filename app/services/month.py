@@ -6,7 +6,7 @@ def resolve_month_window(month: str | None) -> tuple[dt.date, dt.date, str]:
         try:
             parsed = dt.datetime.strptime(month, "%Y-%m")
         except ValueError as exc:
-            raise ValueError("Month must be in YYYY-MM format") from exc
+            raise ValueError("Месяц должен быть в формате YYYY-MM") from exc
         year = parsed.year
         month_value = parsed.month
     else:

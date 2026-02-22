@@ -24,5 +24,5 @@ def test_parse_income_quick_add() -> None:
 
 
 def test_parse_quick_add_without_amount_raises_error() -> None:
-    with pytest.raises(ValueError, match="Amount is missing"):
+    with pytest.raises(ValueError, match="Не найдена сумма"):
         parse_quick_add_text("просто текст")

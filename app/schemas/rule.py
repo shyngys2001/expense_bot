@@ -17,7 +17,7 @@ class RuleCreate(BaseModel):
     def normalize_pattern(cls, value: str) -> str:
         normalized = " ".join(value.strip().split())
         if not normalized:
-            raise ValueError("Pattern cannot be empty")
+            raise ValueError("Паттерн не может быть пустым")
         return normalized
 
 
@@ -35,7 +35,7 @@ class RuleUpdate(BaseModel):
             return None
         normalized = " ".join(value.strip().split())
         if not normalized:
-            raise ValueError("Pattern cannot be empty")
+            raise ValueError("Паттерн не может быть пустым")
         return normalized
 
 

@@ -9,7 +9,7 @@ from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.enums import TransactionKind
+from app.models.enums import TransactionKind, TransactionStatus
 from app.models.transaction import Transaction
 
 TRANSFER_KEYWORDS = (
@@ -141,6 +141,7 @@ async def auto_pair_transfers(
         Transaction.tx_date <= to_date,
         Transaction.transfer_pair_id.is_(None),
         Transaction.kind != TransactionKind.TRANSFER,
+        Transaction.status == TransactionStatus.POSTED,
         or_(Transaction.signed_amount > 0, Transaction.signed_amount < 0),
     ]
     if account_ids:

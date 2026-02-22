@@ -7,7 +7,7 @@ from app.models.account import Account
 from app.models.category import Category
 from app.models.category_rule import CategoryRule
 from app.models.enums import RuleMatchType, TransactionType
-from app.services.accounts import DEFAULT_ACCOUNT_NAME
+from app.services.accounts import DEFAULT_ACCOUNT_NAME, LEGACY_DEFAULT_ACCOUNT_NAME
 
 REQUIRED_EXPENSE_CATEGORIES: Sequence[str] = (
     "Food",
@@ -105,10 +105,13 @@ async def _ensure_rules(
         )
 
 
-async def seed_initial_data(session: AsyncSession) -> None:
+async def seed_initial_data(session: AsyncSession, seed_demo: bool = False) -> None:
+    _ = seed_demo
     account = await session.scalar(select(Account).where(Account.name == DEFAULT_ACCOUNT_NAME))
     if account is None:
-        session.add(Account(name=DEFAULT_ACCOUNT_NAME, bank="Unknown", currency="KZT", is_active=True))
+        account = await session.scalar(select(Account).where(Account.name == LEGACY_DEFAULT_ACCOUNT_NAME))
+    if account is None:
+        session.add(Account(name=DEFAULT_ACCOUNT_NAME, bank="Не указан", currency="KZT", is_active=True))
 
     categories = await _ensure_categories(session)
     await _ensure_rules(session, categories)

@@ -18,11 +18,11 @@ class ParsedQuickAdd:
 def parse_quick_add_text(text: str) -> ParsedQuickAdd:
     cleaned = text.strip()
     if not cleaned:
-        raise ValueError("Input text is empty")
+        raise ValueError("Пустой текст операции")
 
     matches = list(NUMBER_PATTERN.finditer(cleaned))
     if not matches:
-        raise ValueError("Amount is missing")
+        raise ValueError("Не найдена сумма")
 
     amount_match = matches[-1]
     raw_amount = amount_match.group(1).replace(",", ".")
@@ -30,15 +30,15 @@ def parse_quick_add_text(text: str) -> ParsedQuickAdd:
     try:
         amount = Decimal(raw_amount.lstrip("+-"))
     except InvalidOperation as exc:
-        raise ValueError("Amount format is invalid") from exc
+        raise ValueError("Некорректный формат суммы") from exc
 
     if amount <= 0:
-        raise ValueError("Amount must be greater than zero")
+        raise ValueError("Сумма должна быть больше нуля")
 
     description = (cleaned[: amount_match.start()] + cleaned[amount_match.end() :]).strip()
     description = re.sub(r"\s+", " ", description).strip("+- ")
     if not description:
-        description = "Transaction"
+        description = "Операция"
 
     tx_type = TransactionType.INCOME if "+" in cleaned else TransactionType.EXPENSE
 

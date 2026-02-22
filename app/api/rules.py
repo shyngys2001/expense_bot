@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from app.db.session import get_session
 from app.models.category import Category
 from app.models.category_rule import CategoryRule
-from app.models.enums import TransactionKind, TransactionType
+from app.models.enums import TransactionKind, TransactionStatus, TransactionType
 from app.models.transaction import Transaction
 from app.schemas.rule import RuleApplyResponse, RuleCreate, RuleRead, RuleUpdate
 from app.services.categorization_service import find_category_for
@@ -54,7 +54,7 @@ async def list_rules(
 async def create_rule(payload: RuleCreate, session: AsyncSession = Depends(get_session)) -> RuleRead:
     category = await session.get(Category, payload.category_id)
     if category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Категория не найдена")
 
     rule = CategoryRule(
         pattern=payload.pattern,
@@ -88,7 +88,7 @@ async def update_rule(
 ) -> RuleRead:
     rule = await session.get(CategoryRule, rule_id)
     if rule is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rule not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Правило не найдено")
 
     if payload.pattern is not None:
         rule.pattern = payload.pattern
@@ -102,7 +102,7 @@ async def update_rule(
     if payload.category_id is not None:
         category = await session.get(Category, payload.category_id)
         if category is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Категория не найдена")
         rule.category_id = payload.category_id
 
     await session.commit()
@@ -114,7 +114,7 @@ async def update_rule(
     )
     data = row.first()
     if data is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Rule not found")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Правило не найдено")
 
     updated_rule, category = data
     return RuleRead(
@@ -134,7 +134,7 @@ async def update_rule(
 async def delete_rule(rule_id: int, session: AsyncSession = Depends(get_session)) -> dict[str, str]:
     rule = await session.get(CategoryRule, rule_id)
     if rule is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rule not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Правило не найдено")
 
     await session.delete(rule)
     await session.commit()
@@ -151,7 +151,7 @@ async def apply_rules_to_transactions(
     if month and (from_date or to_date):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Use either month or from/to range",
+            detail="Используйте либо month, либо диапазон from/to",
         )
 
     if month:
@@ -180,7 +180,11 @@ async def apply_rules_to_transactions(
 
     for transaction in transactions:
         processed += 1
-        if transaction.category_locked or transaction.kind == TransactionKind.TRANSFER:
+        if (
+            transaction.category_locked
+            or transaction.kind == TransactionKind.TRANSFER
+            or transaction.status == TransactionStatus.PENDING
+        ):
             skipped_locked += 1
             continue
 

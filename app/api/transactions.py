@@ -7,9 +7,15 @@ from sqlalchemy.orm import selectinload
 
 from app.db.session import get_session
 from app.models.category import Category
-from app.models.enums import TransactionKind, TransactionType
+from app.models.enums import TransactionKind, TransactionSource, TransactionStatus, TransactionType
 from app.models.transaction import Transaction
-from app.schemas.transaction import QuickAddRequest, TransactionCreate, TransactionRead, TransactionUpdate
+from app.schemas.transaction import (
+    QuickAddRequest,
+    TransactionCreate,
+    TransactionDebugRead,
+    TransactionRead,
+    TransactionUpdate,
+)
 from app.services.accounts import resolve_account_id
 from app.services.categorization_service import apply_category
 from app.services.month import resolve_month_window
@@ -32,7 +38,7 @@ async def quick_add_transaction(
     try:
         account_id = await resolve_account_id(session, payload.account_id)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Счет не найден") from exc
 
     transaction = Transaction(
         description=parsed.description,
@@ -41,16 +47,17 @@ async def quick_add_transaction(
         currency=parsed.currency,
         type=parsed.tx_type,
         kind=TransactionKind(parsed.tx_type.value),
+        status=TransactionStatus.POSTED,
         account_id=account_id,
         category_id=0,
         category_locked=False,
-        source="quick_add",
+        source=TransactionSource.MANUAL,
         tx_date=dt.date.today(),
     )
     try:
         await apply_category(session, transaction)
     except RuntimeError as exc:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Ошибка автокатегоризации") from exc
 
     session.add(transaction)
     await session.commit()
@@ -65,14 +72,14 @@ async def quick_add_transaction(
         .where(Transaction.id == transaction.id)
     )
     if saved_transaction is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Transaction not found")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Операция не найдена")
 
     return serialize_transaction(saved_transaction)
 
 
 @router.get("/transactions", response_model=list[TransactionRead])
 async def list_transactions(
-    month: str | None = Query(default=None, description="Month in YYYY-MM format"),
+    month: str | None = Query(default=None, description="Месяц в формате YYYY-MM"),
     account_id: int | None = Query(default=None, ge=1),
     session: AsyncSession = Depends(get_session),
 ) -> list[TransactionRead]:
@@ -111,26 +118,27 @@ async def create_transaction(
         currency=payload.currency,
         type=payload.type,
         kind=TransactionKind(payload.type.value),
+        status=TransactionStatus.POSTED,
         category_id=0,
         account_id=0,
         tx_date=payload.tx_date or dt.date.today(),
-        source="manual",
+        source=TransactionSource.MANUAL,
         category_locked=False,
     )
     try:
         transaction.account_id = await resolve_account_id(session, payload.account_id)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Счет не найден") from exc
 
     if payload.category_id is not None:
         category = await session.get(Category, payload.category_id)
         if category is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Категория не найдена")
 
         if category.type != payload.type:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Category type does not match transaction type",
+                detail="Тип категории не совпадает с типом операции",
             )
         transaction.category_id = payload.category_id
         transaction.category_locked = True
@@ -140,7 +148,7 @@ async def create_transaction(
         except RuntimeError as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=str(exc),
+                detail="Ошибка автокатегоризации",
             ) from exc
 
     session.add(transaction)
@@ -156,7 +164,7 @@ async def create_transaction(
         .where(Transaction.id == transaction.id)
     )
     if saved_transaction is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Transaction not found")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Операция не найдена")
 
     return serialize_transaction(saved_transaction)
 
@@ -168,11 +176,31 @@ async def delete_transaction(
 ) -> dict[str, str]:
     transaction = await session.get(Transaction, transaction_id)
     if transaction is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Операция не найдена")
 
     await session.delete(transaction)
     await session.commit()
     return {"status": "ok"}
+
+
+@router.get("/transactions/{transaction_id}/debug", response_model=TransactionDebugRead)
+async def transaction_debug(
+    transaction_id: int,
+    session: AsyncSession = Depends(get_session),
+) -> TransactionDebugRead:
+    transaction = await session.get(Transaction, transaction_id)
+    if transaction is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Операция не найдена")
+
+    return TransactionDebugRead(
+        id=transaction.id,
+        source=transaction.source,
+        import_id=transaction.import_id,
+        account_id=transaction.account_id,
+        raw=transaction.raw,
+        external_hash=transaction.external_hash,
+        created_at=transaction.created_at,
+    )
 
 
 @router.patch("/transactions/{transaction_id}", response_model=TransactionRead)
@@ -191,12 +219,12 @@ async def update_transaction(
         .where(Transaction.id == transaction_id)
     )
     if transaction is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Операция не найдена")
 
     if payload.category_id is None and payload.category_locked is None and payload.kind is None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="At least one field is required: category_id, category_locked or kind",
+            detail="Нужно передать хотя бы одно поле: category_id, category_locked или kind",
         )
 
     category_changed = False
@@ -204,11 +232,11 @@ async def update_transaction(
     if payload.category_id is not None:
         category = await session.get(Category, payload.category_id)
         if category is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Категория не найдена")
         if category.type != transaction.type:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Category type does not match transaction type",
+                detail="Тип категории не совпадает с типом операции",
             )
 
         category_changed = payload.category_id != transaction.category_id

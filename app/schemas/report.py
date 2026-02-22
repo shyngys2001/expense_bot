@@ -12,5 +12,6 @@ class MonthlyReportResponse(BaseModel):
     total_income: Decimal
     total_expense: Decimal
     total_transfers: Decimal
+    total_pending: Decimal
     balance: Decimal
     breakdown_by_category: list[CategoryBreakdownItem]

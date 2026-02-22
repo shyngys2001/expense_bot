@@ -50,7 +50,7 @@ async def list_transfer_pairs_endpoint(
                 left=TransferPairTransaction(
                     transaction_id=left.id,
                     account_id=left.account_id,
-                    account_name=left.account.name if left.account else "Unknown",
+                    account_name=left.account.name if left.account else "Неизвестно",
                     tx_date=left.tx_date,
                     signed_amount=left.signed_amount,
                     currency=left.currency,
@@ -59,7 +59,7 @@ async def list_transfer_pairs_endpoint(
                 right=TransferPairTransaction(
                     transaction_id=right.id,
                     account_id=right.account_id,
-                    account_name=right.account.name if right.account else "Unknown",
+                    account_name=right.account.name if right.account else "Неизвестно",
                     tx_date=right.tx_date,
                     signed_amount=right.signed_amount,
                     currency=right.currency,
